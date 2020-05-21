@@ -168,4 +168,82 @@ murders %>% ggplot(aes(population/10^6 , total, label = abb))+
   ggtitle('US murder in 2010')+
   geom_point(aes(col = region), size = 3)+
   geom_abline(intercept = log10(r), lty = 2, color = 'black')+
-  theme_economist()
+  theme_fivethirtyeight()
+
+#geom_histogram
+library(tidyverse)
+library(dslabs)
+data(heights)
+
+p<- heights %>% 
+  filter(sex == 'Male') %>%
+  ggplot(aes(x = height,col = sex))
+
+p + geom_histogram()
+p + geom_histogram(binwidth = 1)
+#colour
+p + geom_histogram(binwidth = 1,fill = 'blue',col = 'black')+
+  xlab('Male heights in inches')+
+  ggtitle('histogram')
+
+#smooth density plots
+p + geom_density()
+p + geom_density(fill = 'blue')
+
+#for both the gender
+p<- heights %>% 
+  ggplot(aes(x = height,col = sex))
+
+p + geom_histogram()
+p + geom_histogram(binwidth = 1)
+
+p + geom_density()
+p + geom_density(data = heights)
+
+#basic QQ-plot
+p<- heights %>%
+  filter(sex == 'Male') %>%
+  ggplot(aes(sample = height))
+p + geom_qq() #mean=0 sd =1
+#qq-plot against a normal distribution with same mean/sd
+params <- heights %>% 
+  filter(sex=='Male')%>%
+  summarize(mean = mean(height), sd = sd(height))
+p + geom_qq(dparams = params)
+#qq-plot against standard normal distribution
+heights %>%
+  ggplot(aes(sample = scale(height)))+
+  geom_qq()+
+  geom_abline()
+
+
+#two add more graphs on a page
+ds_theme_set()
+library(ggthemes)
+p0<- heights %>%
+  filter(sex == 'Male') %>%
+  ggplot(aes(x = height))
+p1<- heights %>%
+  filter(sex == 'Female') %>%
+  ggplot(aes(x = height))
+g1 <- p0 + geom_histogram(binwidth = 1,fill = 'Blue')+ 
+  xlab('Male heights in inches')+
+  ggtitle('histogram')+
+  theme_foundation()
+g2 <- p1 + geom_histogram(binwidth = 2,fill = 'Red')+ 
+  xlab('Female heights in inches')+
+  ggtitle('histogram')+
+  theme_foundation()
+g3 <- p0 + geom_density(fill = 'Blue')+ 
+  xlab('Male heights in inches')+
+  ggtitle('densityplot')+
+  theme_foundation()
+g4 <- p1 + geom_density(fill = 'Red')+ 
+  xlab('Female heights in inches')+
+  ggtitle('density')+
+  theme_foundation()
+
+install.packages('gridExtra')
+library(gridExtra)
+grid.arrange(g1,g2,g3,g4,ncol = 4)
+grid.arrange(g1,g2,g3,g4,ncol = 2,nrow = 2)
